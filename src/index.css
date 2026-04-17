@@ -1,0 +1,78 @@
+:root {
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #19414f;
+  background:
+    radial-gradient(circle at top left, rgba(15, 136, 145, 0.18), transparent 24%),
+    radial-gradient(circle at top right, rgba(13, 124, 148, 0.16), transparent 22%),
+    linear-gradient(180deg, #f5fbfb 0%, #edf7f7 48%, #e5f1f2 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --ink: #14323b;
+  --muted: #58727a;
+  --accent: #0f8891;
+  --accent-strong: #0a5f77;
+  --line: rgba(10, 95, 119, 0.12);
+  --card: rgba(255, 255, 255, 0.58);
+  --shadow: 0 24px 60px rgba(10, 95, 119, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--ink);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family:
+    'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Times New Roman',
+    serif;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+h1 {
+  font-size: clamp(3rem, 7vw, 5.7rem);
+}
+
+h2 {
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+p {
+  margin: 0;
+}
