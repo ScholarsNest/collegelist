@@ -4,9 +4,9 @@
   font-weight: 400;
   color: #19414f;
   background:
-    radial-gradient(circle at top left, rgba(15, 136, 145, 0.18), transparent 24%),
-    radial-gradient(circle at top right, rgba(13, 124, 148, 0.16), transparent 22%),
-    linear-gradient(180deg, #f5fbfb 0%, #edf7f7 48%, #e5f1f2 100%);
+    radial-gradient(circle at top left, rgba(15, 136, 145, 0.22), transparent 20%),
+    radial-gradient(circle at 85% 10%, rgba(13, 124, 148, 0.18), transparent 18%),
+    linear-gradient(180deg, #eef8f8 0%, #e6f2f2 42%, #ddecee 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -16,9 +16,9 @@
   --muted: #58727a;
   --accent: #0f8891;
   --accent-strong: #0a5f77;
-  --line: rgba(10, 95, 119, 0.12);
-  --card: rgba(255, 255, 255, 0.58);
-  --shadow: 0 24px 60px rgba(10, 95, 119, 0.12);
+  --line: rgba(10, 95, 119, 0.11);
+  --card: rgba(255, 255, 255, 0.68);
+  --shadow: 0 26px 70px rgba(10, 95, 119, 0.11);
   font-size: 15px;
 }
 
@@ -34,6 +34,7 @@ body {
   margin: 0;
   min-width: 320px;
   color: var(--ink);
+  background: transparent;
 }
 
 button,
