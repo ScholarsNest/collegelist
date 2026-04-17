@@ -675,18 +675,20 @@ select:focus,
   }
 
   .filters-panel {
-    display: block;
-    order: -1;
-    position: static;
-    max-height: none;
-    overflow: visible;
+    display: none;
+    position: fixed;
+    inset: 10px;
+    z-index: 40;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+    border-radius: 22px;
+    box-shadow:
+      0 32px 70px rgba(10, 95, 119, 0.22),
+      0 0 0 999px rgba(7, 29, 35, 0.46);
   }
 
-  .filters-panel:not(.mobile-open) .filter-group,
-  .filters-panel:not(.mobile-open) .range-stack,
-  .filters-panel:not(.mobile-open) .toggle-grid,
-  .filters-panel:not(.mobile-open) .sort-row {
-    display: none;
+  .filters-panel.mobile-open {
+    display: block;
   }
 
   .site-header,
