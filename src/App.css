@@ -33,6 +33,15 @@
   padding: 20px;
 }
 
+.hero-copy,
+.filters-panel,
+.results-panel,
+.detail-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(237, 250, 248, 0.84)),
+    var(--card);
+}
+
 .site-header {
   display: flex;
   justify-content: space-between;
@@ -51,10 +60,13 @@
   width: 68px;
   height: 68px;
   flex: 0 0 auto;
-  border-radius: 24px;
-  background: linear-gradient(160deg, rgba(10, 95, 119, 0.08), rgba(15, 136, 145, 0.18));
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.42), transparent 42%),
+    linear-gradient(160deg, rgba(10, 95, 119, 0.14), rgba(15, 136, 145, 0.26));
   display: grid;
   place-items: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 .brand-mark svg {
@@ -66,6 +78,7 @@
   color: var(--ink);
   font-size: 1.18rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .brand-tagline {
@@ -242,8 +255,11 @@
   overflow: hidden;
   background:
     radial-gradient(circle at top right, rgba(15, 136, 145, 0.24), transparent 35%),
-    radial-gradient(circle at bottom left, rgba(10, 95, 119, 0.14), transparent 30%),
-    linear-gradient(180deg, rgba(240, 252, 250, 0.96), rgba(223, 244, 242, 0.88));
+    radial-gradient(circle at bottom left, rgba(10, 95, 119, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(241, 253, 250, 0.98), rgba(224, 247, 243, 0.92));
+  box-shadow:
+    0 24px 60px rgba(10, 95, 119, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .spotlight-tags,
@@ -309,6 +325,10 @@
   scrollbar-color: rgba(10, 95, 119, 0.35) transparent;
 }
 
+.filters-panel {
+  padding-bottom: 24px;
+}
+
 .panel-heading {
   display: flex;
   justify-content: space-between;
@@ -348,6 +368,44 @@
   gap: 8px;
 }
 
+.filter-subtitle {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.quick-toggle-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.filter-group {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid rgba(10, 95, 119, 0.08);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(247, 252, 251, 0.74));
+}
+
+.filter-group-head {
+  margin-bottom: 12px;
+}
+
+.filter-group-head h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.filter-group-head p {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
 .filter-grid,
 .range-stack,
 .detail-list,
@@ -362,6 +420,10 @@
 
 .toggle-grid {
   margin-top: 14px;
+}
+
+.filter-actions {
+  padding-top: 2px;
 }
 
 .sort-row {
@@ -613,11 +675,18 @@ select:focus,
   }
 
   .filters-panel {
-    display: none;
+    display: block;
+    order: -1;
+    position: static;
+    max-height: none;
+    overflow: visible;
   }
 
-  .filters-panel.mobile-open {
-    display: block;
+  .filters-panel:not(.mobile-open) .filter-group,
+  .filters-panel:not(.mobile-open) .range-stack,
+  .filters-panel:not(.mobile-open) .toggle-grid,
+  .filters-panel:not(.mobile-open) .sort-row {
+    display: none;
   }
 
   .site-header,
@@ -634,5 +703,14 @@ select:focus,
 
   .cards-grid {
     grid-template-columns: 1fr;
+  }
+
+  .quick-toggle-bar {
+    margin-top: 10px;
+  }
+
+  .filter-group {
+    margin-top: 12px;
+    padding: 12px;
   }
 }

@@ -308,25 +308,43 @@ function ScholarsNestLogo() {
             <stop offset="100%" stopColor="#0a5f77" />
           </linearGradient>
         </defs>
+        <rect x="24" y="24" width="172" height="172" rx="54" fill="url(#sn-grad)" />
         <path
-          d="M41 162c18 16 43 25 67 25 31 0 53-15 53-38 0-20-12-30-41-39l-24-8c-11-4-17-9-17-17 0-11 11-18 27-18 16 0 32 6 45 18l17-24c-16-14-37-22-61-22-36 0-62 21-62 48 0 22 15 34 37 41l25 8c16 5 20 9 20 17 0 11-10 18-28 18-18 0-36-8-53-22z"
-          fill="url(#sn-grad)"
+          d="M60 154c8-36 33-57 68-57s60 21 68 57"
+          fill="none"
+          stroke="rgba(255,255,255,0.9)"
+          strokeWidth="10"
+          strokeLinecap="round"
         />
         <path
-          d="M130 74l58 72V74h27v112h-24l-59-72v72h-27V74z"
-          fill="url(#sn-grad)"
+          d="M78 148c8-18 25-29 50-29 26 0 42 11 50 29"
+          fill="none"
+          stroke="rgba(255,255,255,0.65)"
+          strokeWidth="8"
+          strokeLinecap="round"
         />
-        <circle cx="127" cy="47" r="15" fill="url(#sn-grad)" />
         <path
-          d="M87 34l29-22h49l-16 13c10 5 17 16 17 29v4c-10-10-21-15-35-15-23 0-39 13-49 36l-2-31-21-1z"
-          fill="url(#sn-grad)"
+          d="M61 82l49-31 49 31-49 15z"
+          fill="#ffffff"
         />
-        <path d="M95 36v19" stroke="#0a5f77" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="95" cy="57" r="4" fill="#0a5f77" />
-        <path d="M95 61l-4 18h8z" fill="#0a5f77" />
+        <path d="M74 84v31" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" />
+        <circle cx="74" cy="117" r="5" fill="#ffffff" />
+        <path d="M74 121l-6 18h12z" fill="#ffffff" />
         <path
-          d="M168 40l10-1 6-7c3-4 9-4 12-1s4 8 0 12l-7 6 1 11-6 8-2-13-15-1z"
-          fill="#0f8891"
+          d="M97 92h17c16 0 28 9 28 24 0 13-10 22-22 22h-9v17H97z"
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M120 92v63l34-63v63"
+          fill="none"
+          stroke="#d8f8f7"
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
     </div>
@@ -524,6 +542,19 @@ function App() {
 
   const featured = filteredSchools[0]
   const quickPicks = useMemo(() => filteredSchools.slice(0, 3), [filteredSchools])
+  const activeFilterCount = [
+    selectedState,
+    selectedRegion,
+    selectedControl,
+    selectedAid,
+    selectedTesting,
+    selectedSetting,
+    selectedBudget,
+    maxCost < 90000 ? 'max-cost' : '',
+    minAidCoverage > 0 ? 'aid-floor' : '',
+    metroOnly ? 'metro' : '',
+    needOnly ? 'need' : '',
+  ].filter(Boolean).length
 
   function clearFilters() {
     startTransition(() => {
@@ -567,7 +598,7 @@ function App() {
             className="pill-button mobile-only"
             onClick={() => setMobileFiltersOpen((value) => !value)}
           >
-            {mobileFiltersOpen ? 'Hide filters' : 'Open filters'}
+            {mobileFiltersOpen ? 'Hide filters' : 'Show filters'}
           </button>
           <div className="live-indicator">
             <span className="live-dot" />
@@ -696,6 +727,11 @@ function App() {
             <div>
               <p className="eyebrow">Filter + search</p>
               <h2>Shape the list</h2>
+              <p className="filter-subtitle">
+                {activeFilterCount
+                  ? `${activeFilterCount} filters active`
+                  : 'Start with budget, testing, or location'}
+              </p>
             </div>
             <button type="button" className="ghost-button" onClick={clearFilters}>
               Reset
@@ -712,142 +748,201 @@ function App() {
             />
           </label>
 
-          <div className="filter-grid">
-            <label className="field">
-              <span>Expected family contribution</span>
-              <select
-                value={selectedBudget}
-                onChange={(event) => setSelectedBudget(event.target.value)}
-              >
-                <option value="">Any budget category</option>
-                {filterOptions.budgets.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field">
-              <span>State</span>
-              <select
-                value={selectedState}
-                onChange={(event) => setSelectedState(event.target.value)}
-              >
-                <option value="">All states</option>
-                {filterOptions.states.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field">
-              <span>Region</span>
-              <select
-                value={selectedRegion}
-                onChange={(event) => setSelectedRegion(event.target.value)}
-              >
-                <option value="">All regions</option>
-                {filterOptions.regions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field">
-              <span>Control</span>
-              <select
-                value={selectedControl}
-                onChange={(event) => setSelectedControl(event.target.value)}
-              >
-                <option value="">Public + private</option>
-                {filterOptions.controls.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field">
-              <span>Aid type</span>
-              <select
-                value={selectedAid}
-                onChange={(event) => setSelectedAid(event.target.value)}
-              >
-                <option value="">Any aid model</option>
-                {filterOptions.aidTypes.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field">
-              <span>Testing policy</span>
-              <select
-                value={selectedTesting}
-                onChange={(event) => setSelectedTesting(event.target.value)}
-              >
-                <option value="">Any testing policy</option>
-                {filterOptions.testing.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field">
-              <span>Campus setting</span>
-              <select
-                value={selectedSetting}
-                onChange={(event) => setSelectedSetting(event.target.value)}
-              >
-                <option value="">Any setting</option>
-                {filterOptions.settings.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <div className="quick-toggle-bar">
+            <button
+              type="button"
+              className={`toggle-chip ${selectedControl === 'Private' ? 'active' : ''}`}
+              onClick={() =>
+                setSelectedControl((value) => (value === 'Private' ? '' : 'Private'))
+              }
+            >
+              Private
+            </button>
+            <button
+              type="button"
+              className={`toggle-chip ${selectedControl === 'Public' ? 'active' : ''}`}
+              onClick={() =>
+                setSelectedControl((value) => (value === 'Public' ? '' : 'Public'))
+              }
+            >
+              Public
+            </button>
+            <button
+              type="button"
+              className={`toggle-chip ${selectedTesting === 'Opt.' ? 'active' : ''}`}
+              onClick={() =>
+                setSelectedTesting((value) => (value === 'Opt.' ? '' : 'Opt.'))
+              }
+            >
+              Test optional
+            </button>
+            <button
+              type="button"
+              className={`toggle-chip ${needOnly ? 'active' : ''}`}
+              onClick={() => setNeedOnly((value) => !value)}
+            >
+              Meets need
+            </button>
           </div>
 
-          <div className="range-stack">
-            <label className="field">
-              <span>Max cost after aid: {formatCurrency(maxCost)}</span>
-              <input
-                type="range"
-                min="5000"
-                max="90000"
-                step="2500"
-                value={maxCost}
-                onChange={(event) => setMaxCost(Number(event.target.value))}
-              />
-            </label>
+          <section className="filter-group">
+            <div className="filter-group-head">
+              <h3>Financial fit</h3>
+              <p>Match the list to your budget and aid expectations.</p>
+            </div>
+            <div className="filter-grid">
+              <label className="field">
+                <span>Expected family contribution</span>
+                <select
+                  value={selectedBudget}
+                  onChange={(event) => setSelectedBudget(event.target.value)}
+                >
+                  <option value="">Any budget category</option>
+                  {filterOptions.budgets.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="field">
-              <span>Minimum international aid coverage: {minAidCoverage}%</span>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value={minAidCoverage}
-                onChange={(event) =>
-                  setMinAidCoverage(Number(event.target.value))
-                }
-              />
-            </label>
-          </div>
+              <div className="range-stack">
+                <label className="field">
+                  <span>Max cost after aid: {formatCurrency(maxCost)}</span>
+                  <input
+                    type="range"
+                    min="5000"
+                    max="90000"
+                    step="2500"
+                    value={maxCost}
+                    onChange={(event) => setMaxCost(Number(event.target.value))}
+                  />
+                </label>
 
-          <div className="toggle-grid">
+                <label className="field">
+                  <span>Minimum international aid coverage: {minAidCoverage}%</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={minAidCoverage}
+                    onChange={(event) =>
+                      setMinAidCoverage(Number(event.target.value))
+                    }
+                  />
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section className="filter-group">
+            <div className="filter-group-head">
+              <h3>Academic + admissions</h3>
+              <p>Use policy and selectivity filters to refine options fast.</p>
+            </div>
+            <div className="filter-grid">
+              <label className="field">
+                <span>Aid type</span>
+                <select
+                  value={selectedAid}
+                  onChange={(event) => setSelectedAid(event.target.value)}
+                >
+                  <option value="">Any aid model</option>
+                  {filterOptions.aidTypes.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="field">
+                <span>Testing policy</span>
+                <select
+                  value={selectedTesting}
+                  onChange={(event) => setSelectedTesting(event.target.value)}
+                >
+                  <option value="">Any testing policy</option>
+                  {filterOptions.testing.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section className="filter-group">
+            <div className="filter-group-head">
+              <h3>Campus + location</h3>
+              <p>Filter by geography, setting, and access to metro areas.</p>
+            </div>
+            <div className="filter-grid">
+              <label className="field">
+                <span>State</span>
+                <select
+                  value={selectedState}
+                  onChange={(event) => setSelectedState(event.target.value)}
+                >
+                  <option value="">All states</option>
+                  {filterOptions.states.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="field">
+                <span>Region</span>
+                <select
+                  value={selectedRegion}
+                  onChange={(event) => setSelectedRegion(event.target.value)}
+                >
+                  <option value="">All regions</option>
+                  {filterOptions.regions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="field">
+                <span>Campus setting</span>
+                <select
+                  value={selectedSetting}
+                  onChange={(event) => setSelectedSetting(event.target.value)}
+                >
+                  <option value="">Any setting</option>
+                  {filterOptions.settings.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="field">
+                <span>School type</span>
+                <select
+                  value={selectedControl}
+                  onChange={(event) => setSelectedControl(event.target.value)}
+                >
+                  <option value="">Public + private</option>
+                  {filterOptions.controls.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <div className="toggle-grid filter-actions">
             <button
               type="button"
               className={`toggle-chip ${metroOnly ? 'active' : ''}`}
