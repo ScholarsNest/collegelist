@@ -3,24 +3,15 @@
     'Segoe UI', sans-serif;
   line-height: 1.45;
   font-weight: 400;
-  color: #142725;
-  background: #edf3ee;
+  color: #162724;
+  background: #fffdf8;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --ink: #142725;
-  --muted: #617370;
-  --accent: #9b7418;
-  --line: rgba(32, 63, 58, 0.14);
-  --surface: #fffdf7;
-  --surface-strong: #ffffff;
-  --deep: #173832;
-  --deep-2: #102b2a;
-  --soft-green: #dfeee7;
-  --soft-gold: #f7e7b2;
-  --shadow: 0 24px 70px rgba(25, 47, 43, 0.12);
+  --ink: #162724;
+  --muted: #64716d;
 }
 
 * {
@@ -34,14 +25,13 @@ html {
 body {
   min-width: 320px;
   margin: 0;
-  background:
-    linear-gradient(115deg, rgba(237, 243, 238, 0.92) 0 32%, transparent 32% 100%),
-    linear-gradient(296deg, rgba(247, 231, 178, 0.5) 0 18%, transparent 18% 100%),
-    linear-gradient(180deg, #edf3ee 0%, #faf8ef 48%, #e8f2ed 100%);
+  background: #fffdf8;
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -56,9 +46,6 @@ button {
 h1,
 h2,
 h3 {
-  font-family: Georgia, 'Times New Roman', serif;
-  line-height: 1.08;
-  letter-spacing: 0;
   color: var(--ink);
 }
 
