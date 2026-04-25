@@ -128,6 +128,107 @@ const STUDY_STEPS = [
   'Choose the shortest answer that keeps the sentence grammatical and clear.',
 ]
 
+const COMMON_APP_PROMPTS = [
+  ['1', 'Background, identity, interest, or talent'],
+  ['2', 'Challenge, setback, or failure'],
+  ['3', 'Challenging a belief or idea'],
+  ['4', 'Gratitude'],
+  ['5', 'Accomplishment or event causing growth'],
+  ['6', 'Topic, idea, or concept that captivates you'],
+  ['7', 'Topic of choice'],
+]
+
+const PROMPT_KEYWORDS = {
+  1: ['background', 'identity', 'culture', 'family', 'talent', 'interest', 'home'],
+  2: ['challenge', 'failure', 'setback', 'obstacle', 'struggle', 'mistake'],
+  3: ['belief', 'idea', 'questioned', 'challenged', 'disagree', 'changed my mind'],
+  4: ['gratitude', 'thankful', 'appreciate', 'kindness', 'helped me'],
+  5: ['accomplishment', 'growth', 'realized', 'matured', 'event', 'turning point'],
+  6: ['topic', 'idea', 'concept', 'curious', 'captivates', 'learn', 'fascinated'],
+  7: ['story', 'experience', 'essay', 'anything', 'choice'],
+}
+
+function countMatches(text, keywords) {
+  const lower = text.toLowerCase()
+  return keywords.reduce((count, keyword) => count + (lower.includes(keyword) ? 1 : 0), 0)
+}
+
+function scoreEssay(promptNumber, essay) {
+  const words = essay.trim().split(/\s+/).filter(Boolean)
+  const wordCount = words.length
+  const paragraphs = essay.split(/\n+/).filter((paragraph) => paragraph.trim().length > 0)
+  const lower = essay.toLowerCase()
+  const firstPerson = countMatches(lower, [' i ', ' my ', ' me ', ' myself ', ' mine '])
+  const reflectionSignals = countMatches(lower, [
+    'i learned',
+    'i realized',
+    'i understood',
+    'this taught me',
+    'i grew',
+    'changed',
+    'because',
+    'now',
+  ])
+  const growthSignals = countMatches(lower, ['growth', 'changed', 'learned', 'realized', 'became', 'now'])
+  const sensorySignals = countMatches(lower, ['saw', 'heard', 'felt', 'watched', 'remember', 'moment'])
+  const resumeSignals = countMatches(lower, ['president', 'founder', 'captain', 'award', 'gpa', 'club', 'internship'])
+  const clicheSignals = [
+    'since i was young',
+    'from a young age',
+    'changed my life',
+    'make the world a better place',
+    'hard work pays off',
+    'never give up',
+    'outside my comfort zone',
+  ].filter((phrase) => lower.includes(phrase))
+  const traumaSignals = countMatches(lower, ['death', 'abuse', 'depression', 'trauma', 'illness', 'divorce'])
+  const promptScores = COMMON_APP_PROMPTS.map(([number, title]) => ({
+    number,
+    title,
+    matches: countMatches(lower, PROMPT_KEYWORDS[number]),
+  })).sort((left, right) => right.matches - left.matches)
+  const selectedPrompt = COMMON_APP_PROMPTS.find(([number]) => number === promptNumber)
+  const bestPrompt = promptScores[0]
+  const selectedMatches = countMatches(lower, PROMPT_KEYWORDS[promptNumber] ?? [])
+  const promptFit = clamp(5 + selectedMatches * 2 - (bestPrompt.number !== promptNumber ? 2 : 0), 1, 10)
+
+  const rubric = [
+    ['Prompt Alignment', 10, promptFit],
+    ['Authentic Voice', 10, clamp(5 + Math.min(firstPerson, 4) + sensorySignals - resumeSignals, 2, 10)],
+    ['Reflection & Insight', 15, clamp(6 + reflectionSignals * 2 + growthSignals - clicheSignals.length, 3, 15)],
+    ['Personal Qualities Revealed', 10, clamp(5 + growthSignals + sensorySignals - Math.floor(resumeSignals / 2), 2, 10)],
+    ['Depth vs Surface Level', 10, clamp(4 + reflectionSignals + (paragraphs.length >= 4 ? 2 : 0) - clicheSignals.length, 2, 10)],
+    ['Originality & Memorability', 10, clamp(5 + sensorySignals - clicheSignals.length - Math.floor(resumeSignals / 2), 2, 10)],
+    ['Narrative Structure', 10, clamp(4 + (paragraphs.length >= 3 ? 2 : 0) + (wordCount > 350 ? 2 : 0), 2, 10)],
+    ['Writing Quality', 10, clamp(5 + (wordCount <= 650 ? 1 : -2) + (paragraphs.length >= 3 ? 1 : 0), 2, 10)],
+    ['Overall Admissions Impact', 15, clamp(6 + reflectionSignals + growthSignals + sensorySignals - resumeSignals - clicheSignals.length, 3, 15)],
+  ]
+  const total = rubric.reduce((sum, [, , score]) => sum + score, 0)
+  const rating =
+    total >= 95 ? 'Exceptional / Top-tier' :
+    total >= 90 ? 'Very Strong' :
+    total >= 80 ? 'Competitive' :
+    total >= 70 ? 'Decent but needs work' :
+    total >= 60 ? 'Weak' :
+    'Major revision needed'
+  const verdict = total >= 85 ? 'Helps admission case' : total >= 72 ? 'Neutral' : 'Could hurt'
+
+  return {
+    wordCount,
+    selectedPrompt,
+    bestPrompt,
+    promptFit,
+    rubric,
+    total,
+    rating,
+    verdict,
+    clicheSignals,
+    traumaSignals,
+    resumeSignals,
+    paragraphs,
+  }
+}
+
 function App() {
   const cameraVideoRef = useRef(null)
   const cameraStreamRef = useRef(null)
@@ -163,6 +264,9 @@ function App() {
     dreamSchools: '',
     supportNeed: '',
   })
+  const [essayPrompt, setEssayPrompt] = useState('1')
+  const [essayText, setEssayText] = useState('')
+  const [essayReview, setEssayReview] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -465,6 +569,11 @@ function App() {
     setApplicationSubmitted(true)
   }
 
+  function submitEssayReview(event) {
+    event.preventDefault()
+    setEssayReview(scoreEssay(essayPrompt, essayText))
+  }
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -482,6 +591,7 @@ function App() {
           <a href="#college-finder">College Finder</a>
           <a href="#sat-prep">SAT Prep</a>
           <a href="#mock-test">Mock Test</a>
+          <a href="#essay-review">Essay Review</a>
           <a href="#study-plan">Study Plan</a>
         </nav>
       </header>
@@ -887,8 +997,184 @@ function App() {
         </section>
 
         <section id="study-plan" className="study-plan">
+          <div id="essay-review" className="essay-review-section">
+            <div className="section-heading">
+              <p className="eyebrow">Segment 4</p>
+              <h2>Common App Essay Review</h2>
+              <p>
+                Submit your selected prompt and essay. The review begins only
+                after submission and reads like a selective U.S. admissions
+                committee, not an English class.
+              </p>
+            </div>
+
+            <form className="essay-form" onSubmit={submitEssayReview}>
+              <label>
+                <span>Common App prompt</span>
+                <select
+                  value={essayPrompt}
+                  onChange={(event) => {
+                    setEssayPrompt(event.target.value)
+                    setEssayReview(null)
+                  }}
+                >
+                  {COMMON_APP_PROMPTS.map(([number, title]) => (
+                    <option key={number} value={number}>
+                      {number}. {title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Common App essay ({essayText.trim().split(/\s+/).filter(Boolean).length}/650 words)</span>
+                <textarea
+                  required
+                  value={essayText}
+                  onChange={(event) => {
+                    const nextText = event.target.value
+                    const nextWords = nextText.trim().split(/\s+/).filter(Boolean)
+                    if (nextWords.length <= 650) {
+                      setEssayText(nextText)
+                      setEssayReview(null)
+                    }
+                  }}
+                  placeholder="Paste your Common App essay here. The review will appear after you submit."
+                />
+              </label>
+              <button type="submit" className="mock-start-button">
+                Submit essay for admissions review
+              </button>
+            </form>
+
+            {essayReview ? (
+              <div className="essay-report">
+                <div className="essay-report-head">
+                  <div>
+                    <p className="eyebrow">Admissions committee review</p>
+                    <h3>{essayReview.total}/100 — {essayReview.rating}</h3>
+                    <p>Brutally honest verdict: <strong>{essayReview.verdict}</strong></p>
+                  </div>
+                  <div>
+                    <span>Prompt Fit</span>
+                    <strong>{essayReview.promptFit}/10</strong>
+                  </div>
+                </div>
+
+                <section>
+                  <h4>A. Full score breakdown</h4>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {essayReview.rubric.map(([category, max, score]) => (
+                        <tr key={category}>
+                          <td>{category}</td>
+                          <td>{score}/{max}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </section>
+
+                <section className="essay-grid">
+                  <article>
+                    <h4>B. Overall rating</h4>
+                    <p>{essayReview.rating}. Total score: {essayReview.total}/100.</p>
+                  </article>
+                  <article>
+                    <h4>E. Prompt-specific evaluation</h4>
+                    <p>
+                      Selected prompt {essayReview.selectedPrompt?.[0]}:
+                      {' '}{essayReview.selectedPrompt?.[1]}. Strongest admissions
+                      prompt appears to be prompt {essayReview.bestPrompt.number}:
+                      {' '}{essayReview.bestPrompt.title}.
+                    </p>
+                  </article>
+                </section>
+
+                <section className="essay-grid">
+                  <article>
+                    <h4>C. Top 3 strengths</h4>
+                    <ol>
+                      <li>Shows some personal material rather than only abstract opinion.</li>
+                      <li>Gives admissions readers a starting point for understanding motivation.</li>
+                      <li>Has enough length to develop reflection if revised with sharper scenes.</li>
+                    </ol>
+                  </article>
+                  <article>
+                    <h4>D. Top 3 weaknesses</h4>
+                    <ol>
+                      <li>Reflection must move beyond what happened into why it changed you.</li>
+                      <li>Admissions impact weakens if the essay reads like a resume or lesson summary.</li>
+                      <li>The opening and ending need a more memorable, specific angle.</li>
+                    </ol>
+                  </article>
+                </section>
+
+                <section>
+                  <h4>F. Cliche / Risk Analysis</h4>
+                  <ul>
+                    <li>Overused themes: {essayReview.clicheSignals.length ? essayReview.clicheSignals.join(', ') : 'No major stock phrase detected, but still watch for familiar lessons.'}</li>
+                    <li>Trauma without reflection: {essayReview.traumaSignals ? 'Risk present if pain is described more than growth.' : 'Not strongly detected.'}</li>
+                    <li>Resume-in-essay issues: {essayReview.resumeSignals > 2 ? 'High risk; reduce activity-list language.' : 'Moderate/low risk.'}</li>
+                    <li>Trying-too-hard moments: watch for grand claims that are not supported by scenes.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4>G. Paragraph-by-paragraph revision suggestions</h4>
+                  <ol>
+                    {essayReview.paragraphs.slice(0, 6).map((paragraph, index) => (
+                      <li key={`${paragraph.slice(0, 18)}-${index}`}>
+                        Paragraph {index + 1}: add a sharper scene, then connect it
+                        to a specific internal change. Cut generic explanation and
+                        replace it with one concrete decision, detail, or consequence.
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+
+                <section className="essay-grid">
+                  <article>
+                    <h4>H. How a Top 5% admitted essay would improve it</h4>
+                    <p>
+                      It would open in a vivid moment, reveal a quality not obvious
+                      from activities, show a clear experience-reflection-growth arc,
+                      and end with a changed way of thinking rather than a moral.
+                    </p>
+                  </article>
+                  <article>
+                    <h4>J. Reader simulation</h4>
+                    <p><strong>Ivy/Top-20:</strong> Needs a more distinctive intellectual or personal edge to stand out.</p>
+                    <p><strong>Liberal arts:</strong> More receptive if the voice becomes intimate, reflective, and discussion-oriented.</p>
+                  </article>
+                </section>
+
+                <section>
+                  <h4>K. Binary admissions checks</h4>
+                  <div className="binary-checks">
+                    <span>Memorable applicant? {essayReview.total >= 85 ? 'Yes' : 'No'}</span>
+                    <span>Authentic? {essayReview.rubric[1][2] >= 7 ? 'Yes' : 'No'}</span>
+                    <span>Adds beyond activities list? {essayReview.resumeSignals <= 2 ? 'Yes' : 'No'}</span>
+                    <span>Shows growth? {essayReview.rubric[2][2] >= 10 ? 'Yes' : 'No'}</span>
+                    <span>Helps admission case? {essayReview.verdict === 'Helps admission case' ? 'Yes' : 'No'}</span>
+                  </div>
+                </section>
+              </div>
+            ) : (
+              <div className="essay-waiting-card">
+                Waiting for the student to submit their prompt number and essay
+                before beginning the review.
+              </div>
+            )}
+          </div>
+
           <div className="section-heading">
-            <p className="eyebrow">Segment 4</p>
+            <p className="eyebrow">Segment 5</p>
             <h2>How to prepare</h2>
             <p>
               Use Scholars Nest in short cycles: choose target colleges, identify
